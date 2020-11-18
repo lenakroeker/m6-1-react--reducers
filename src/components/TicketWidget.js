@@ -1,28 +1,20 @@
-import React, { useContext } from "react";
+import React from "react";
 import styled from "styled-components";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { SeatContext } from "./SeatContext";
+
 import { getRowName, getSeatNum } from "../helpers";
 import { range } from "../utils";
-import SeatImage from "../assets/seat-available.svg";
 
-const TicketWidget = () => {
-  // TODO: use values from Context
+import Seat from "./Seat";
+import { SeatContext } from "./SeatContext";
+
+function TicketWidget() {
   const {
     state: { hasLoaded, seats, numOfRows, seatsPerRow },
   } = React.useContext(SeatContext);
-  // const numOfRows = 6;
-  // const seatsPerRow = 6;
-
-  // TODO: implement the loading spinner <CircularProgress />
-  // with the hasLoaded flag
 
   if (!hasLoaded) {
-    return (
-      <Center>
-        <CircularProgress />
-      </Center>
-    );
+    return <CircularProgress />;
   }
 
   return (
@@ -35,19 +27,18 @@ const TicketWidget = () => {
             <RowLabel>Row {rowName}</RowLabel>
             {range(seatsPerRow).map((seatIndex) => {
               const seatId = `${rowName}-${getSeatNum(seatIndex)}`;
+              const seat = seats[seatId];
 
-              if ((seats[seatId].isBooked = true)) {
-                return (
-                  <SeatWrapper key={seatId}>
-                    {/* TODO: Render the actual <Seat /> */}
-                    <SeatImg className="unavailable" src={SeatImage} />
-                  </SeatWrapper>
-                );
-              }
               return (
                 <SeatWrapper key={seatId}>
-                  {/* TODO: Render the actual <Seat /> */}
-                  <SeatImg src={SeatImage} />
+                  <Seat
+                    rowIndex={rowIndex}
+                    seatIndex={seatIndex}
+                    width={36}
+                    height={36}
+                    price={seat.price}
+                    status={seat.isBooked ? "unavailable" : "available"}
+                  />
                 </SeatWrapper>
               );
             })}
@@ -56,14 +47,11 @@ const TicketWidget = () => {
       })}
     </Wrapper>
   );
-};
+}
 
 const Wrapper = styled.div`
   background: #eee;
   border: 1px solid #ccc;
-  width: fit-content;
-  height: fit-content;
-  margin: 30px auto;
   border-radius: 3px;
   padding: 8px;
 `;
@@ -77,22 +65,20 @@ const Row = styled.div`
 `;
 
 const RowLabel = styled.div`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  transform: translateX(calc(-100% - 30px));
+  font-size: 14px;
+  color: white;
   font-weight: bold;
+  line-height: 46px;
 `;
 
 const SeatWrapper = styled.div`
   padding: 5px;
-`;
-
-const Center = styled.div`
-  position: fixed;
-  margin: 200px auto 0 49vw;
-`;
-
-const SeatImg = styled.img`
-  &.unavailable {
-    filter: grayscale(100%);
-  }
 `;
 
 export default TicketWidget;
